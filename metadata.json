@@ -1,0 +1,7 @@
+{
+  "name": "IdeaScan - Visiting Card Scanner",
+  "description": "Professional visiting card scanner for Idea Holiday Pvt Ltd. Extracts contact details instantly using Gemini AI.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
