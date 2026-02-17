@@ -2,13 +2,22 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { BusinessCardData } from "../types";
 
 // Initialize Gemini API
-// Note: In a production environment, never expose keys on the client side.
-// This is a demo architecture.
+// Guidelines: The API key must be obtained exclusively from the environment variable process.env.API_KEY.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const scanBusinessCard = async (base64Image: string): Promise<BusinessCardData> => {
-  // Remove data URL prefix if present
-  const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
+  // Extract MIME type and base64 data correctly to ensure model compatibility
+  const match = base64Image.match(/^data:(image\/[a-z]+);base64,(.+)$/);
+  let mimeType = 'image/jpeg';
+  let cleanBase64 = base64Image;
+
+  if (match) {
+    mimeType = match[1];
+    cleanBase64 = match[2];
+  } else {
+    // Fallback cleanup if regex match fails but it has a header
+    cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
+  }
 
   try {
     const response = await ai.models.generateContent({
@@ -17,7 +26,7 @@ export const scanBusinessCard = async (base64Image: string): Promise<BusinessCar
         parts: [
           {
             inlineData: {
-              mimeType: 'image/jpeg',
+              mimeType: mimeType,
               data: cleanBase64
             }
           },
